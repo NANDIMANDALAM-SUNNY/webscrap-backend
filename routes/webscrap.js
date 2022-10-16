@@ -1,13 +1,9 @@
 var express = require('express');
-const { fetchProductData, getProductDetails } = require('../controllers/Product');
-const { Register ,login, confirmAccount, forgotPassword, resetPassword, newPassword} = require('../controllers/users');
+const { getProductDetails } = require('../controllers/Product');
+const { validate } = require('../middleware/middleware');
 var router = express.Router();
 
 
-
-
-router.get('/product-details', getProductDetails)
-
-
+router.get('/product-details',validate , getProductDetails)
 
 module.exports = router;

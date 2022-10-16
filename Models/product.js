@@ -17,6 +17,19 @@ const productSchema = mongoose.Schema({
         required:true, 
        
     },
+    ratings:{
+        type:String,
+        required:true,
+    },
+    originalPrice:{
+        type:String,
+        required:true,
+    },
+    offerPercentage:{
+        type:String,
+        required:true,
+    },
+    specifications:[],
     createdAt : {
         type: Date,
         default: Date.now

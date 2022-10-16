@@ -4,7 +4,8 @@ const nodemailer = require('nodemailer');
 const {hashPassword,hashCompare,createToken, jwtDecode} = require('../middleware/middleware');
 const userSchema = require('../Models/user')
 const {cloudinary} = require('../utils/cloudinary')
-const randomString = require('randomstring')
+const randomString = require('randomstring');
+const { fetchProductData } = require('./Product');
 
 
 
@@ -199,5 +200,26 @@ try {
 }
 
 
+const getProfile = async (req, res) => {
+  try {
+    fetchProductData()
+    const token = req.header('jwt-token');
+    const decoded = await jwtDecode(token)
+    const user = await userSchema.findOne({_id:decoded.id})
+    res.send({
+      statusbar:200,
+      success:true,
+      message:"Profile Fetched Successfully",
+      data:user
+    })
+  }
+    catch (error) {
+      res.send({
+        statusCode:400,
+        message:error
+      })
+    }
+}
 
-module.exports = {Register, login, confirmAccount, forgotPassword, resetPassword, newPassword}
+
+module.exports = {Register, login, confirmAccount, forgotPassword, resetPassword, newPassword, getProfile}

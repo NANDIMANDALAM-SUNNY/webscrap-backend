@@ -44,15 +44,17 @@ app.use(fileUpload({
 }))
 
 
-fetchProductData()
-// amazonData()
-
+setInterval(() => {
+  fetchProductData()
+  console.log("New Data fetched after 12 hours")
+}, 43200000);
 
 
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/webscrap', productsRouter);
+
 
 
 

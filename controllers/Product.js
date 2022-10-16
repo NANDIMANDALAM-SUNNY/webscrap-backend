@@ -5,94 +5,50 @@ const flipkartUrl = "https://www.flipkart.com/search?q=mobiles&otracker=search&o
 const productData = []
 
 const fetchProductData = async (req,res)=>{
-
   try {
       const response = await axios.get(flipkartUrl)
       const $=cheerio.load(response.data);
       const mobiles = $("._3Mn1Gg > ._1AtVbE")
       console.log(mobiles.length)
       mobiles.map((item,index)=>{
+        image = $(index).find('._3exPp9').attr("src");
         title = $(index).find("._4rR01T").text();
         price = $(index).find("._30jeq3").text();
-        image = $(index).find('._3exPp9').attr("src");
         originalPrice = $(index).find("._27UcVY").text();
         ratings = $(index).find("._2_R_DZ > span > span ").text();
-        // specifications = $(index).find(".row").map((item,indx)=>{
-          
-        // })
-        // 
-
-        productData.push({image,title,price,ratings,originalPrice})
+        originalPrice = $(index).find("._27UcVY").text();
+        offerPercentage = $(index).find("._3Ay6Sb > span").text();
+        const specifications = [];
+        $(index).find("ul >li").each(function(){
+            specifications.push($(this).text());
+          })
+        productData.push({image,title,price,ratings,originalPrice,originalPrice,specifications,offerPercentage})
       })
-      // const datas = await productSchema.insertOne({})
-         const datas = await productSchema.create(productData);
-         console.log(productData)
-
+          try {
+            const datas = await productSchema.create(productData)
+            res.status(200).json(datas)
+          } catch (error) {
+            console.log("error creating product")
+          }
         } catch (error) {
          console.log(error);
      }
 }
 
 
-// const amazonUrl = "https://www.snapdeal.com/products/electronics-headphones?sort=plrty#bcrumbLabelId:676"
-
-// const amazonData = async ()=>{
-// try {
-//     const response = await axios.get(amazonUrl)
-
-//     const $=cheerio.load(response.data);
-//     const mobiles = $(".ref-freeze-reference-point")
-//     mobiles.each(function(){
-//         image = $(this).find("img").attr("src");
-//         // title = $(this).find(".a-text-normal").text();
-        
-//         // price = $(this).find("._30jeq3").text();
-//       //   const specifications = [];
-//       //   $(this).find(".rgWa7D").each(function(){
-//       //       specifications.push($(this).text());
-//       //   })
-//       productData.push({image})
-
-//        })
-
-//        console.log(productData)
-       
-//        console.log(productData.length)
-
-// } catch (error) {
-//     console.log(error);    
-// }
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 const getProductDetails = async (req,res) => {
 try {
   const page = parseInt(req.query.page) - 1 || 0;
-  const limit = parseInt(req.query.limit) || 76;
+  const limit = parseInt(req.query.limit) || 5;
   const search = req.query.search || "";
-  let sort = req.query.sort || "title";
-
+  let sort = req.query.sort || "createdAt";
   req.query.sort ? (sort = req.query.sort.split(",")) : (sort = [sort]);
-
   let sortBy = {};
   if (sort[1]) {
     sortBy[sort[0]] = sort[1];
   } else {
-    sortBy[sort[0]] = "asc";
+    sortBy[sort[0]] = "desc";
   }
     // const datas = await productSchema.find()
     const movies = await productSchema.find({ title : { $regex: search, $options: "i" } })
