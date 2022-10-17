@@ -8,7 +8,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var productsRouter = require('./routes/webscrap');
 const { default: mongoose } = require('mongoose');
-const { dburl } = require('./views/DbConnection/dbConnection');
+const { dburl } = require('./DbConnection/dbConnection');
 const fileUpload = require('express-fileupload');
 const { fetchProductData,amazonData } = require('./controllers/Product');
 
