@@ -124,7 +124,7 @@ const login = async (req,res)=>{
       console.log(req.body.email)
      const userData =  await userSchema.findOne({email:req.body.email})
      if(userData){
-        const token = jwt.sign({email:req.body.email},'jsonsecret',{expiresIn:'1m'})
+        const token = jwt.sign({email:req.body.email},'jsonsecret',{expiresIn:'15m'})
         const data = await  userSchema.updateOne({email:req.body.email},{$set:{forgotPasswordToken:token}});
         sendResetpasswordMail(userData.name,userData.email,token)
           res.send({
@@ -152,7 +152,7 @@ const login = async (req,res)=>{
 const resetPassword =async (req,res)=>{
   try {
     const tokenData = await  userSchema.findOne({forgotPasswordToken:req.params.token})
-    console.log(req.params.token)
+    // console.log(req.params.token)
     if(tokenData){
       const decodeJWt = await jwtDecode(tokenData.forgotPasswordToken);
        let currentTime = Math.round(new Date()/1000)
@@ -168,22 +168,43 @@ const resetPassword =async (req,res)=>{
           })
       }
       else{
-      res.status(400).send({success:true,msg:"Link has been expired"})
+      // res.status(400).send({success:true,msg:"Link has been expired"})//
+        res.send({
+          statusbar:204,
+          success:true,
+          message:"Link has been expired",
+        })
+
       }
   }
   else{
-      res.status(400).send({success:true,msg:"This link has already used to reset password"})
+      // res.status(400).send({success:true,msg:"This link has already used to reset password"})
+      res.send({
+      statusbar:204,
+        success:true,
+        message:"This link has already used to reset password",
+      })
   }
   } catch (error) {
-      res.status(400).send({success:false,msg:"Error"})
+      // res.status(400).send({success:false,msg:"Error"})
+      res.send({
+        statusbar:204,
+        success:false,
+        message:"Error"
+      })
   }
 }
 
 const newPassword = async (req,res)=>{
 try {
+  const {token} = req.params
+
+  const decoded = await jwtDecode(token);
   const password = req.body.password
   const newPassword = await hashPassword(password)
-  const user = await userSchema.findOneAndUpdate({email:req.body.email},{$set:{password:newPassword}},{new:true})
+  console.log(decoded)
+  const user = await userSchema.findOneAndUpdate({email:decoded.email},{$set:{password:newPassword}},{new:true})
+  console.log(user)
   res.send({
       statusbar:200,
       success:true,
